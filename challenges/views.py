@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.urls import reverse
 
 challenge = {
     "january" : "Walk for at least 30 min every day",
@@ -19,25 +20,27 @@ challenge = {
 def index(request):
     return HttpResponse("Este es un mensaje desde el index")
 
-#def monthly_challenges(request, month):
-    #challenge_text = challenge.get(month)
-    #if challenge_text:
-    #    return HttpResponse(challenge_text)
-   # else:
-  #      return HttpResponseNotFound("Este mes no existe")
-#def monthly_challenges_numer(request, month):
-#    month_name = dicc.get(month)
- #   if month_name:
-  #      return monthly_challenges(request, month_name)
-   # else:
-    #    return HttpResponseNotFound("Este mes no existe")##
 
 def  monthly_challenges(request, month):
-    #try:
+    try:
         challenge_text = challenge[month]
         return render (request, "challenges/challenge.html", {
             "text": challenge_text,
             "month_name": month
         })
-    #except:
+    except:
         return HttpResponseNotFound("<h1> Este mes no existe</h1>")
+def monthly_challenges_number(request, month):
+    months = list(challenge.keys())
+    
+    if month > len(months) or month < 1:
+        return HttpResponseNotFound("<h1> Este mes no existe</h1>")
+    
+    redirect_month = months[month - 1]
+    redirect_path = reverse("month-challenge", args=[redirect_month])
+    
+    return HttpResponseRedirect(redirect_path)
+
+   
+
+    
